@@ -1,0 +1,9 @@
+[project]
+name = "agentic-teaching-bot"
+version = "0.1.0"
+description = "AUA NLP homework: local-LLM Telegram teaching assistant"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
