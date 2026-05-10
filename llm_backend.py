@@ -50,7 +50,7 @@ def _chat_completions_url(base_url: str) -> str:
 def generate(
     messages: list[dict[str, str]],
     temperature: float = 0.2,
-    max_tokens: int = 1400,
+    max_tokens: int = 900,
     config: LocalLLMConfig | None = None,
 ) -> str:
     """Generate text using the local LLM server.
@@ -68,11 +68,17 @@ def generate(
     """
     cfg = config or LocalLLMConfig.from_env()
     url = _chat_completions_url(cfg.base_url)
+    try:
+        max_tokens_cap = int(os.getenv("LLM_MAX_TOKENS_CAP", "900"))
+    except ValueError:
+        max_tokens_cap = 900
+    effective_max_tokens = max(128, min(max_tokens, max_tokens_cap))
+
     payload: dict[str, Any] = {
         "model": cfg.model,
         "messages": messages,
         "temperature": temperature,
-        "max_tokens": max_tokens,
+        "max_tokens": effective_max_tokens,
     }
     headers = {"Content-Type": "application/json"}
     if cfg.api_key:

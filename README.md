@@ -63,8 +63,9 @@ Edit `.env` and add:
 
 ```text
 TELEGRAM_BOT_TOKEN=...
-LLM_BASE_URL=http://127.0.0.1:8000/v1
-LLM_MODEL=local-qwen
+LLM_BASE_URL=http://127.0.0.1:11434/v1
+LLM_MODEL=qwen2.5:1.5b
+LLM_MAX_TOKENS_CAP=900
 SMTP_USERNAME=...
 SMTP_PASSWORD=...
 SMTP_FROM=...
@@ -74,7 +75,25 @@ For Gmail, use an app password, not your normal password.
 
 ## 4. Run a local LLM server
 
-### Option A: vLLM
+### Option A: Ollama (recommended for low-resource computers)
+
+Example:
+
+```bash
+ollama pull qwen2.5:1.5b
+ollama serve
+```
+
+Then set:
+
+```text
+LLM_BASE_URL=http://127.0.0.1:11434/v1
+LLM_MODEL=qwen2.5:1.5b
+LLM_API_KEY=EMPTY
+LLM_MAX_TOKENS_CAP=900
+```
+
+### Option B: vLLM
 
 Example:
 

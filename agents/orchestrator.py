@@ -41,7 +41,7 @@ class TeachingAssistantAgent:
         self.chat_id = chat_id
         self.allow_fallback = os.getenv("ALLOW_LLM_FALLBACK", "false").lower() == "true"
 
-    def _generate_or_fallback(self, messages: list[dict[str, str]], fallback: str, max_tokens: int = 1200) -> str:
+    def _generate_or_fallback(self, messages: list[dict[str, str]], fallback: str, max_tokens: int = 900) -> str:
         try:
             return generate(messages, temperature=0.2, max_tokens=max_tokens)
         except LLMError as exc:
@@ -70,14 +70,14 @@ class TeachingAssistantAgent:
         summary = self._generate_or_fallback(
             slide_summary_prompt(slide_context, request.output_language),
             fallback=fallback_summary,
-            max_tokens=900,
+            max_tokens=600,
         )
         log_event(self.chat_id, "slide_summary_done", {"chars": len(summary)})
 
         concept_map = self._generate_or_fallback(
             concept_map_prompt(slide_context, request.output_language),
             fallback="- Main concepts: extracted from slide titles and bullet points.\n- Prerequisites: basic NLP and machine learning vocabulary.",
-            max_tokens=900,
+            max_tokens=500,
         )
         log_event(self.chat_id, "concept_map_done", {"chars": len(concept_map)})
 
@@ -97,14 +97,14 @@ class TeachingAssistantAgent:
                 output_language=request.output_language,
             ),
             fallback=self._fallback_plan(request, summary, concept_map, resources_md, chunks=len(chunks)),
-            max_tokens=2200,
+            max_tokens=1200,
         )
         log_event(self.chat_id, "teaching_plan_done", {"chars": len(plan)})
 
         revision = self._generate_or_fallback(
             revision_prompt(plan, request.duration_minutes, request.output_language),
             fallback="Revision checklist: timing should be verified manually; grounding tags are included where available; web search may need rerun if no results returned.",
-            max_tokens=700,
+            max_tokens=350,
         )
 
         package_md = f"""{plan}
